@@ -271,6 +271,7 @@ String AT::LINK(int cell){
   }while(responseAT.indexOf("OK")!=-1); //4 para OK
 
 
+
   while(digitalRead(SIGNALink)==false){
   }
   
@@ -308,7 +309,6 @@ String AT::DISC(){
       Serial.println("------");
       Serial.println(responseAT.indexOf("OK"));
     }*/
-    
   }while(responseAT.indexOf("OK")==0); //4 para OK
   responseAT=responseAT.substring(0, responseAT.length()-2); //remove \r\n from command string  
   return String(Serial.println(responseAT));  

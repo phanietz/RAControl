@@ -1,8 +1,9 @@
 #include "SendtoDisplay.h"
 #include "ATcommands.h"
-
+#include "SendtoBox.h"
 
 AT Bluetooth;
+Box tobox;
 
 Display::Display(){};
 
@@ -126,6 +127,8 @@ void Display::connect(int cell){
   Serial2.write(0xff);
   Serial2.write(0xff);
   Serial2.write(0xff);
+
+  tobox.motor1();
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////

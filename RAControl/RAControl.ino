@@ -64,7 +64,7 @@ void loop(){
   
   if (Serial2.available()){    
     aux = char(Serial2.read());
-    Serial.println(aux);
+    //Serial.println(aux);
     if(aux.endsWith(".")){
 
       variables(data_from_nextion);   
@@ -86,6 +86,7 @@ void variables(String data_from_nextion){
   Serial.println(data_from_nextion);
   //Serial.println(data_from_nextion.length());                                                                                                                                                         
 
+//////////////////DISPLAY/////////////////////////
   if(data_from_nextion.indexOf("connectSPAS")!=-1){
     display.start();
     display.refresh();
@@ -117,5 +118,57 @@ void variables(String data_from_nextion){
     display.SendSystemsAvailbles(true);
   }
   
-  Serial.println("-------------End");
+  /////////////////////////////////////////////////
+  /////////////////////BOX/////////////////////////
+  if(data_from_nextion.indexOf("SPASmotor1")!=-1){
+    //send to box
+    box.motor1();
+    //sen to display
+  }
+  if(data_from_nextion.indexOf("SPASmotor2")!=-1){
+    //box
+    box.motor2();
+    //display    
+  }
+  if(data_from_nextion.indexOf("SPASmotor3")!=-1){
+    //box
+    box.motor3();
+    //display    
+  }
+
+  if(data_from_nextion.indexOf("+x")!=-1){
+    //send to box
+    box.x1();
+
+    //sen to display
+  }
+  if(data_from_nextion.indexOf("-x")!=-1){
+    //box
+    box.x2();
+    //display    
+  }
+
+  if(data_from_nextion.indexOf("+y")!=-1){
+    //send to box
+    box.y1();
+
+    //sen to display
+  }
+  if(data_from_nextion.indexOf("-y")!=-1){
+    //box
+    box.y2();
+    //display    
+  }
+
+  if(data_from_nextion.indexOf("+z")!=-1){
+    //send to box
+    box.z1();
+
+    //sen to display
+  }
+  if(data_from_nextion.indexOf("-z")!=-1){
+    //box
+    box.z2();
+    //display    
+  }
 }

@@ -18,7 +18,20 @@ class Box{
 
   public:
     Box();
-
+    motor1();
+    motor2();
+    motor3();
+    x1();
+    x2();
+    y1();
+    y2();        
+    z1();
+    z2();
+    slow();
+    fast();
+    reboot();
+    enter();
+    exit();
 };
 
 #endif
