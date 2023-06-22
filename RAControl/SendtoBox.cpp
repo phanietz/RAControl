@@ -65,18 +65,24 @@ Box::z2(){
   delay(200);
 };
 
-Box::slow(){
-  Serial.println("envia slow");
-  Serial3.write("16769055.\r\n");
-  Serial3.flush();
-  delay(200);
-};
+Box::step(int s){
+  if(s==1){
+    Serial.println("envia STEP L");
+    Serial3.write("1001.\r\n");
+    Serial3.flush();
+    delay(200);    
+  }else if(s==2){
+    Serial.println("envia STEP M");
+    Serial3.write("1002.\r\n");
+    Serial3.flush();
+    delay(200);    
+  }else if(s==3){
+    Serial.println("envia STEP H");
+    Serial3.write("1003.\r\n");
+    Serial3.flush();
+    delay(200);    
+  }
 
-Box::fast(){
-  Serial.println("envia fast");
-  Serial3.write("16754775.\r\n");
-  Serial3.flush();
-  delay(200);
 };
 
 Box::reboot(){

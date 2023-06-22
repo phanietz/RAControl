@@ -15,7 +15,6 @@ class Box{
       {"14:7:518D1","-OFF","-204"}, 
       {"2016:7:251806","-OFF","-205"} //REAL
       };
-
   public:
     Box();
     motor1();
@@ -27,8 +26,7 @@ class Box{
     y2();        
     z1();
     z2();
-    slow();
-    fast();
+    step(int s);
     reboot();
     enter();
     exit();

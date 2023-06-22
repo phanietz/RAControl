@@ -38,6 +38,7 @@ Role: 1 (master)
 #define SIGNALink 53
 
 String data_from_nextion="", aux="";
+bool endwait=false;
 void variables(String data_from_nextion);
 
 Display display;
@@ -80,7 +81,6 @@ void loop(){
 
 }
 
-
 void variables(String data_from_nextion){
 
   Serial.println(data_from_nextion);
@@ -114,8 +114,9 @@ void variables(String data_from_nextion){
   }else if(data_from_nextion.indexOf("exitMenu-access1")!=-1){
     display.SendSystemsAvailbles(true);
   }else if(data_from_nextion.indexOf("exit")!=-1){
+    box.exit();
     display.disconnect();
-    display.SendSystemsAvailbles(true);
+    display.SendSystemsAvailbles(true); 
   }
   
   /////////////////////////////////////////////////
@@ -161,14 +162,39 @@ void variables(String data_from_nextion){
   }
 
   if(data_from_nextion.indexOf("+z")!=-1){
-    //send to box
     box.z1();
-
-    //sen to display
   }
   if(data_from_nextion.indexOf("-z")!=-1){
-    //box
     box.z2();
-    //display    
   }
+  if(data_from_nextion.indexOf("StepL")!=-1){
+    box.step(1); 
+  }  
+  if(data_from_nextion.indexOf("StepM")!=-1){
+    box.step(2);
+  }  
+  if(data_from_nextion.indexOf("StepH")!=-1){
+    box.step(3);
+  }    
+  if(data_from_nextion.indexOf("calibrate")!=-1){
+    endwait=false;
+    do{
+      if (Serial2.available()){    
+        aux = char(Serial2.read());
+        if(aux.endsWith(".")){
+          if(data_from_nextion.indexOf("Yes")!=-1){
+            box.reboot();
+            endwait=true;
+          }
+          if(data_from_nextion.indexOf("No")!=-1){
+            endwait=true;
+          }          
+          data_from_nextion ="";
+        }else{
+          data_from_nextion += aux;
+        }
+      }
+    }while(endwait==false);
+    Serial.println("Exit reboot");
+  }        
 }

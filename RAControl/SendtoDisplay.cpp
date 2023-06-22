@@ -114,11 +114,11 @@ void Display::connect(int cell){
   Serial2.write(0xff);
   Serial2.write(0xff);
 
-  responseAT=Bluetooth.RESET();
+  //responseAT=Bluetooth.RESET();
 
-  responseAT=Bluetooth.INIT();
+  //responseAT=Bluetooth.INIT();
 
-  responseAT=Bluetooth.INQ(false);
+  //responseAT=Bluetooth.INQ(false);
 
   responseAT=Bluetooth.LINK(cell);
 
