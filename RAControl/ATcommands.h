@@ -1,12 +1,10 @@
+//The communication with the BLUETOOTH is through Serial3
+
 #ifndef ATCOMMANDS_H
 #define ATCOMMANDS_H
 #include <Arduino.h>
 #define ENABLE 9
 #define SIGNALink 53
-
-//methods in this class that sends commands to Display:
-//+INQ
-//find with: Serial2.print
 
 class AT{
   private:
@@ -29,7 +27,7 @@ class AT{
     String INQM(String param);
     String RESET();
     String INIT();    
-    String INQ(bool mode);
+    String INQ(bool mode, class Display &Dis);
     String LINK(int cell);
     String DISC();
 };

@@ -5,6 +5,7 @@
 //https://www.youtube.com/watch?v=sNe-lkVQhqI
 
 #include "ATcommands.h"
+#include "SendtoDisplay.h"
 #define ENABLE 9
 #define SIGNALink 53
 
@@ -25,7 +26,7 @@ String AT::INQM(String param){
       responseAT += a;
     }
     //Serial.println(responseAT.length());
-  }while(responseAT.compareTo("OK\r\n")!=0); //4 para OK
+  }while(responseAT.compareTo("OK\r\n")!=0); //if 0 means equal
   
   responseAT=responseAT.substring(0, responseAT.length()-2); //remove \r\n from command string  
   return String(Serial.println(responseAT));
@@ -46,7 +47,7 @@ String AT::RESET(){
       responseAT += a; 
     }
     //Serial.println(responseAT.length());
-  }while(responseAT.compareTo("OK\r\n")!=0); //4 para OK
+  }while(responseAT.compareTo("OK\r\n")!=0); //if 0 means equal
   
   responseAT=responseAT.substring(0, responseAT.length()-2); //remove \r\n from command string    
   return String(Serial.println(responseAT));
@@ -71,7 +72,7 @@ String AT::INIT(){
       //Serial.println(responseAT);
       responseAT="OK\r\n";
     }
-  }while(responseAT.compareTo("OK\r\n")!=0); //4 para OK
+  }while(responseAT.compareTo("OK\r\n")!=0); //if 0 means equal
 
   responseAT=responseAT.substring(0, responseAT.length()-2); //remove \r\n from command string    
   return String(Serial.println(responseAT));
@@ -80,7 +81,7 @@ String AT::INIT(){
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-String AT::INQ(bool mode){
+String AT::INQ(bool mode, class Display &Dis){
   Serial.println("AT+INQ"); 
   Serial3.write("AT+INQ\r\n");
   Serial3.flush();
@@ -99,7 +100,6 @@ String AT::INQ(bool mode){
     while(Serial3.available()>0){
       a = char(Serial3.read());
       responseAT += a;
-      //Serial3.flush();
       delay(50);
     }
     
@@ -116,10 +116,9 @@ String AT::INQ(bool mode){
       }
     }
     if(responseAT.compareTo("OK\r\n")==0){ //when detect OK
-      Serial2.print("ProgressBar.val=50"); //progress bar: Refresh
-      Serial2.write(0xff);
-      Serial2.write(0xff);
-      Serial2.write(0xff);
+
+      Dis.ProgressBar(50);
+
       refreshCount++;
       if(auxEndMarker.compareTo("\nOK\r\n")!=0){ //verify that the sentence of the structure is correct
         if(refreshCount>=2){
@@ -148,10 +147,7 @@ String AT::INQ(bool mode){
           Serial.print("Total bytes: ");
           Serial.println(text.length());
         }
-        Serial2.print("ProgressBar.val=75"); //progress bar: Refresh
-        Serial2.write(0xff);
-        Serial2.write(0xff);
-        Serial2.write(0xff);        
+        Dis.ProgressBar(75);   
       }
     }
   }while(auxEndMarker.compareTo("\nOK\r\n")!=0); //if is 4 means only read OK and not full data
@@ -215,10 +211,7 @@ String AT::INQ(bool mode){
     
   }else{
     ////////////////////================================= Send to Display: page SPASOn
-    Serial2.print("ProgressBar.val=100");
-    Serial2.write(0xff);
-    Serial2.write(0xff);
-    Serial2.write(0xff); 
+    Dis.ProgressBar(100);
     responseAT="Yes";
   }
 
@@ -261,23 +254,15 @@ String AT::LINK(int cell){
       a = char(Serial3.read());
       responseAT += a;
     }
-      //Serial doesn't write after conection
-      /*
-      Serial.println(responseAT.length());
-      Serial.println(responseAT);
-      Serial3.write("Master conected\r\n");
-      */
+    //Serial.println(responseAT.length());
+    //Serial.println(responseAT);
+    //Serial3.write("Master conected\r\n");
+  }while(responseAT.indexOf("OK")==-1); //if its >= 0 means "OK" was received
 
-  }while(responseAT.indexOf("OK")!=-1); //4 para OK
+  //while(digitalRead(SIGNALink)==false){}
 
-
-
-  while(digitalRead(SIGNALink)==false){
-  }
-  
-  //responseAT=responseAT.substring(0, responseAT.length()-2); //remove \r\n from command string
-  return String(Serial.println("OK"));
-
+  responseAT=responseAT.substring(0, responseAT.length()-2); //remove \r\n from command string
+  return String(Serial.println(responseAT));
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -289,7 +274,6 @@ String AT::DISC(){
   delay(500);
   digitalWrite(ENABLE, HIGH);
   delay(500);
-  
   Serial3.write("AT+DISC\r\n");
   Serial3.flush();
 
@@ -301,15 +285,10 @@ String AT::DISC(){
       a = char(Serial3.read());
       responseAT += a;
     }    
-    /*if(responseAT.length()!=0){
-      Serial.println("------");
-      Serial.println(responseAT.length());
-      Serial.println(responseAT);
-      Serial.println(aux);
-      Serial.println("------");
-      Serial.println(responseAT.indexOf("OK"));
-    }*/
-  }while(responseAT.indexOf("OK")==0); //4 para OK
+    //Serial.println(responseAT.length());
+    //Serial.println(responseAT);
+  }while(responseAT.indexOf("OK")==-1); //if its >= 0 means "OK" was received
+  
   responseAT=responseAT.substring(0, responseAT.length()-2); //remove \r\n from command string  
   return String(Serial.println(responseAT));  
 };

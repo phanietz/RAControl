@@ -23,7 +23,7 @@ Role: 1 (master)
  */
 
 /*Control remote has 2 kind of comunications TX-RX
-1. Arduino MEGA with nextion display (TX2, RX2)
+1. Arduino MEGA with nextion Display (TX2, RX2)
 2. Arduino MEGA with bluetooth interface (TX3, RX3)
 */
 
@@ -35,14 +35,18 @@ Role: 1 (master)
 
 #include "SendtoDisplay.h"
 #include "SendtoBox.h"
+#include "ATcommands.h"
+
 #define SIGNALink 53
 
 String data_from_nextion="", aux="";
+String responseAT;
 bool endwait=false;
 void variables(String data_from_nextion);
 
-Display display;
+Display DisplayTouch;
 Box box;
+AT Bluetooth;
 
 void setup(){
   pinMode(9, OUTPUT);
@@ -83,99 +87,125 @@ void loop(){
 
 void variables(String data_from_nextion){
 
+  Serial.print("From Display: ");
   Serial.println(data_from_nextion);
   //Serial.println(data_from_nextion.length());                                                                                                                                                         
 
-//////////////////DISPLAY/////////////////////////
-  if(data_from_nextion.indexOf("connectSPAS")!=-1){
-    display.start();
-    display.refresh();
+
+  if(data_from_nextion.indexOf("connectSPAS")!=-1 or data_from_nextion.indexOf("Refresh")!=-1){
+    if(data_from_nextion.indexOf("connectSPAS")!=-1){
+      responseAT=Bluetooth.INQM("1,9,8");
+    }
+    responseAT=Bluetooth.RESET();
+    DisplayTouch.refresh();
+    responseAT=Bluetooth.INIT();
+
+
+    responseAT=Bluetooth.INQ(false, DisplayTouch); //progress 50, 75 and 100
+
+
+    if(responseAT.compareTo("Yes")==0){
+      DisplayTouch.SendSystemsAvailables(false, Bluetooth);
+    }
   }
 
-  if(data_from_nextion.indexOf("Refresh")!=-1){
-    display.refresh();
+
+  if(data_from_nextion.indexOf("SPAS2")!=-1){
+    Serial.println("------CONECTAR-----");
+    DisplayTouch.connect(1);
+
+    if(data_from_nextion.indexOf("SPAS201")!=-1){
+      responseAT=Bluetooth.LINK(201);
+    }else if(data_from_nextion.indexOf("SPAS202")!=-1){
+      responseAT=Bluetooth.LINK(202);
+    }else if(data_from_nextion.indexOf("SPAS204")!=-1){
+      responseAT=Bluetooth.LINK(204);
+    }else if(data_from_nextion.indexOf("SPAS205")!=-1){
+      responseAT=Bluetooth.LINK(205);
+    }else if(data_from_nextion.indexOf("SPAS209")!=-1){
+      responseAT=Bluetooth.LINK(209);
+    }else if(data_from_nextion.indexOf("SPAS210")!=-1){
+      responseAT=Bluetooth.LINK(210);
+    }else if(data_from_nextion.indexOf("SPAS211")!=-1){
+      responseAT=Bluetooth.LINK(211);
+    }else if(data_from_nextion.indexOf("SPAS212")!=-1){
+      responseAT=Bluetooth.LINK(212);
+    }
+    
+    DisplayTouch.connect(2);
+    box.motor1();
   }
 
-  if(data_from_nextion.indexOf("SPAS201")!=-1){
-    display.connect(201);
-  }
 
-  if(data_from_nextion.indexOf("SPAS202")!=-1){
-    display.connect(202);
-  }
-
-  if(data_from_nextion.indexOf("SPAS205")!=-1){
-    display.connect(205);
-  }
-
-  //exit
-  if(data_from_nextion.indexOf("exitMenu-access0")!=-1){
-    display.menu(0);
-  }else if(data_from_nextion.indexOf("exitMenu-access1")!=-1){
-    display.SendSystemsAvailbles(true);
-  }else if(data_from_nextion.indexOf("exit")!=-1){
+  if(data_from_nextion.indexOf("Disconnect")!=-1){
+    Serial.println("------DESCONECTAR-----");
     box.exit();
-    display.disconnect();
-    display.SendSystemsAvailbles(true); 
+    DisplayTouch.disconnect(1);
+    responseAT=Bluetooth.DISC();
+    DisplayTouch.disconnect(2);
+    DisplayTouch.disconnect(3);
+    DisplayTouch.SendSystemsAvailables(false, Bluetooth); 
+  }
+
+
+  if(data_from_nextion.indexOf("exitMenu-access0")!=-1){
+    DisplayTouch.menu(0, Bluetooth);
+  }else if(data_from_nextion.indexOf("exitMenu-access1")!=-1){
+    DisplayTouch.SendSystemsAvailables(true, Bluetooth);
   }
   
-  /////////////////////////////////////////////////
-  /////////////////////BOX/////////////////////////
+
+  //////////////////////////////////////////
+  ////////////INTO SPASystem////////////////
+  //////////////////////////////////////////
   if(data_from_nextion.indexOf("SPASmotor1")!=-1){
-    //send to box
     box.motor1();
-    //sen to display
   }
+
   if(data_from_nextion.indexOf("SPASmotor2")!=-1){
-    //box
     box.motor2();
-    //display    
   }
+
   if(data_from_nextion.indexOf("SPASmotor3")!=-1){
-    //box
     box.motor3();
-    //display    
   }
 
   if(data_from_nextion.indexOf("+x")!=-1){
-    //send to box
     box.x1();
-
-    //sen to display
   }
+
   if(data_from_nextion.indexOf("-x")!=-1){
-    //box
     box.x2();
-    //display    
   }
 
   if(data_from_nextion.indexOf("+y")!=-1){
-    //send to box
     box.y1();
-
-    //sen to display
   }
+
   if(data_from_nextion.indexOf("-y")!=-1){
-    //box
     box.y2();
-    //display    
   }
 
   if(data_from_nextion.indexOf("+z")!=-1){
     box.z1();
   }
+
   if(data_from_nextion.indexOf("-z")!=-1){
     box.z2();
   }
+
   if(data_from_nextion.indexOf("StepL")!=-1){
     box.step(1); 
-  }  
+  }
+
   if(data_from_nextion.indexOf("StepM")!=-1){
     box.step(2);
-  }  
+  }
+
   if(data_from_nextion.indexOf("StepH")!=-1){
     box.step(3);
-  }    
+  }
+
   if(data_from_nextion.indexOf("calibrate")!=-1){
     endwait=false;
     do{

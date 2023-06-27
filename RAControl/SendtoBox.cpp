@@ -3,63 +3,72 @@
 Box::Box(){};
 
 Box::motor1(){
-  Serial.println("envia motor1");
+  Serial.print("To Box: ");
+  Serial.println("16753245");
   Serial3.write("16753245.\r\n");
   Serial3.flush();
   delay(200);
 }
 
 Box::motor2(){
-  Serial.println("envia motor2");
+  Serial.print("To Box: ");
+  Serial.println("16736925");
   Serial3.write("16736925.\r\n");
   Serial3.flush();
   delay(200);
 }
 
 Box::motor3(){
-  Serial.println("envia motor3");
+  Serial.print("To Box: ");
+  Serial.println("16769565");
   Serial3.write("16769565.\r\n");
   Serial3.flush();
   delay(200);
 }
 
 Box::x1(){
-  Serial.println("envia +x");
+  Serial.print("To Box: ");
+  Serial.println("16720605");
   Serial3.write("16720605.\r\n");
   Serial3.flush();
   delay(200);
 };
 
 Box::x2(){
-  Serial.println("envia -x");
+  Serial.print("To Box: ");
+  Serial.println("16712445");
   Serial3.write("16712445.\r\n");
   Serial3.flush();
   delay(200);
 };
 
 Box::y1(){
-  Serial.println("envia +y");
+  Serial.print("To Box: ");
+  Serial.println("16720605");
   Serial3.write("16720605.\r\n");
   Serial3.flush();
   delay(200);
 };
 
 Box::y2(){
-  Serial.println("envia -y");
+  Serial.print("To Box: ");
+  Serial.println("16712445");
   Serial3.write("16712445.\r\n");
   Serial3.flush();
   delay(200);
 };
 
 Box::z1(){
-  Serial.println("envia +z");
+  Serial.print("To Box: ");
+  Serial.println("16720605");
   Serial3.write("16720605.\r\n");
   Serial3.flush();
   delay(200);
 };
 
 Box::z2(){
-  Serial.println("envia -z");
+  Serial.print("To Box: ");
+  Serial.println("16712445");
   Serial3.write("16712445.\r\n");
   Serial3.flush();
   delay(200);
@@ -67,17 +76,20 @@ Box::z2(){
 
 Box::step(int s){
   if(s==1){
-    Serial.println("envia STEP L");
+    Serial.print("To Box: ");
+    Serial.println("1001");
     Serial3.write("1001.\r\n");
     Serial3.flush();
     delay(200);    
   }else if(s==2){
-    Serial.println("envia STEP M");
+    Serial.print("To Box: ");
+    Serial.println("1002");
     Serial3.write("1002.\r\n");
     Serial3.flush();
     delay(200);    
   }else if(s==3){
-    Serial.println("envia STEP H");
+    Serial.print("To Box: ");
+    Serial.println("1003");
     Serial3.write("1003.\r\n");
     Serial3.flush();
     delay(200);    
@@ -86,21 +98,24 @@ Box::step(int s){
 };
 
 Box::reboot(){
-  Serial.println("envia reboot");
+  Serial.print("To Box: ");
+  Serial.println("16756815");
   Serial3.write("16756815.\r\n");
   Serial3.flush();
   delay(200);
 };
 
 Box::enter(){
-  Serial.println("envia enter");
+  Serial.print("To Box: ");
+  Serial.println("16761405");
   Serial3.write("16761405.\r\n");
   Serial3.flush();
   delay(200);
 };
 
 Box::exit(){
-  Serial.println("envia exit");
+  Serial.print("To Box: ");
+  Serial.println("16748655");
   Serial3.write("16748655.\r\n");
   Serial3.flush();
   delay(200);
