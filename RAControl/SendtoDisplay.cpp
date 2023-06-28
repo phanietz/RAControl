@@ -12,7 +12,6 @@ void Display::refresh(){
   Serial2.write(0xff);
   Serial2.write(0xff);
   Serial2.write(0xff);
-  ProgressBar(25);
   
 };
 
@@ -97,15 +96,9 @@ void Display::disconnect(int send){
     Serial2.write(0xff);
     Serial2.write(0xff);
     Serial2.write(0xff);  
-    ProgressBar(35);
   }
 
   if(send == 2){
-    ProgressBar(70);
-  }
-
-  if(send == 3){
-    ProgressBar(100);
     Serial2.print("page SPASOn");
     Serial2.write(0xff);
     Serial2.write(0xff);
@@ -121,6 +114,12 @@ void Display::ProgressBar(int value){
     case 0:
       Serial2.print("ProgressBar.val=0");  
     break;
+    case 10:
+      Serial2.print("ProgressBar.val=10");
+    break;   
+    case 25:
+      Serial2.print("ProgressBar.val=25");
+    break;     
     case 35:
       Serial2.print("ProgressBar.val=35");
     break;

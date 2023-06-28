@@ -286,10 +286,34 @@ String AT::DISC(){
       responseAT += a;
     }    
     //Serial.println(responseAT.length());
-    //Serial.println(responseAT);
+    Serial.println(responseAT);
   }while(responseAT.indexOf("OK")==-1); //if its >= 0 means "OK" was received
   
   responseAT=responseAT.substring(0, responseAT.length()-2); //remove \r\n from command string  
   return String(Serial.println(responseAT));  
 };
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+bool AT::WaitCopy(){
+  //unsigned long time=0, auxtime=0;
+  //time = millis();
+  do{
+    responseAT="";
+    delay(100);
+    while(Serial3.available()>0){
+      a = char(Serial3.read());
+      responseAT += a;    
+    }
+    //Serial.println(responseAT.length());
+    Serial.println(responseAT);
+    /*auxtime = millis();
+    Serial.println(time-auxtime);
+    if(time-auxtime >= 4294965386){
+      return false;
+    }*/
+  }while(responseAT.indexOf("COPY\r\n")==-1); //if 0 means equal
+
+  return true;
+};

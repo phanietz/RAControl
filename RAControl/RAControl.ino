@@ -41,7 +41,7 @@ Role: 1 (master)
 
 String data_from_nextion="", aux="";
 String responseAT;
-bool endwait=false;
+bool endwait=false, connected=false;
 void variables(String data_from_nextion);
 
 Display DisplayTouch;
@@ -93,19 +93,20 @@ void variables(String data_from_nextion){
 
 
   if(data_from_nextion.indexOf("connectSPAS")!=-1 or data_from_nextion.indexOf("Refresh")!=-1){
+    DisplayTouch.refresh();
+    DisplayTouch.ProgressBar(10);
     if(data_from_nextion.indexOf("connectSPAS")!=-1){
       responseAT=Bluetooth.INQM("1,9,8");
     }
+    DisplayTouch.ProgressBar(25);
     responseAT=Bluetooth.RESET();
-    DisplayTouch.refresh();
     responseAT=Bluetooth.INIT();
-
-
+    DisplayTouch.ProgressBar(50);
     responseAT=Bluetooth.INQ(false, DisplayTouch); //progress 50, 75 and 100
 
-
+    DisplayTouch.ProgressBar(75);
     if(responseAT.compareTo("Yes")==0){
-      DisplayTouch.SendSystemsAvailables(false, Bluetooth);
+      DisplayTouch.SendSystemsAvailables(true, Bluetooth);
     }
   }
 
@@ -113,7 +114,7 @@ void variables(String data_from_nextion){
   if(data_from_nextion.indexOf("SPAS2")!=-1){
     Serial.println("------CONECTAR-----");
     DisplayTouch.connect(1);
-
+    DisplayTouch.ProgressBar(25);
     if(data_from_nextion.indexOf("SPAS201")!=-1){
       responseAT=Bluetooth.LINK(201);
     }else if(data_from_nextion.indexOf("SPAS202")!=-1){
@@ -132,8 +133,16 @@ void variables(String data_from_nextion){
       responseAT=Bluetooth.LINK(212);
     }
     
-    DisplayTouch.connect(2);
-    box.motor1();
+    DisplayTouch.ProgressBar(50);
+    connected=Bluetooth.WaitCopy();
+    if(connected==true){
+      DisplayTouch.ProgressBar(75);
+      box.motor1();
+      DisplayTouch.connect(2);
+    }else{
+      Serial.println("ERROR trying to connect");
+    }
+
   }
 
 
@@ -141,10 +150,12 @@ void variables(String data_from_nextion){
     Serial.println("------DESCONECTAR-----");
     box.exit();
     DisplayTouch.disconnect(1);
+    DisplayTouch.ProgressBar(25);
     responseAT=Bluetooth.DISC();
+    DisplayTouch.ProgressBar(50);
     DisplayTouch.disconnect(2);
-    DisplayTouch.disconnect(3);
     DisplayTouch.SendSystemsAvailables(false, Bluetooth); 
+    DisplayTouch.ProgressBar(75);
   }
 
 

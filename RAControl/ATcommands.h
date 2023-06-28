@@ -30,6 +30,7 @@ class AT{
     String INQ(bool mode, class Display &Dis);
     String LINK(int cell);
     String DISC();
+    bool WaitCopy();
 };
 
 #endif
