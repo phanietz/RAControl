@@ -5,11 +5,11 @@
 #define SENDTOBOX_H
 #include <Arduino.h>
 
-class Box{
+class BOX{
   private:
     String responseAT="";
   public:
-    Box();
+    BOX();
     motor1();
     motor2();
     motor3();
@@ -23,6 +23,7 @@ class Box{
     reboot();
     enter();
     exit();
+    receiveDataOfMemory();
 };
 
 #endif

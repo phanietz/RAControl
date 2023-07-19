@@ -1,8 +1,8 @@
 #include "SendtoBox.h"
 
-Box::Box(){};
+BOX::BOX(){};
 
-Box::motor1(){
+BOX::motor1(){
   Serial.print("To Box: ");
   Serial.println("16753245");
   Serial3.write("16753245.\r\n");
@@ -10,7 +10,7 @@ Box::motor1(){
   delay(200);
 }
 
-Box::motor2(){
+BOX::motor2(){
   Serial.print("To Box: ");
   Serial.println("16736925");
   Serial3.write("16736925.\r\n");
@@ -18,7 +18,7 @@ Box::motor2(){
   delay(200);
 }
 
-Box::motor3(){
+BOX::motor3(){
   Serial.print("To Box: ");
   Serial.println("16769565");
   Serial3.write("16769565.\r\n");
@@ -26,15 +26,15 @@ Box::motor3(){
   delay(200);
 }
 
-Box::x1(){
+BOX::x1(){
   Serial.print("To Box: ");
   Serial.println("16720605");
   Serial3.write("16720605.\r\n");
   Serial3.flush();
-  delay(200);
+  delay(200);  
 };
 
-Box::x2(){
+BOX::x2(){
   Serial.print("To Box: ");
   Serial.println("16712445");
   Serial3.write("16712445.\r\n");
@@ -42,7 +42,7 @@ Box::x2(){
   delay(200);
 };
 
-Box::y1(){
+BOX::y1(){
   Serial.print("To Box: ");
   Serial.println("16720605");
   Serial3.write("16720605.\r\n");
@@ -50,7 +50,7 @@ Box::y1(){
   delay(200);
 };
 
-Box::y2(){
+BOX::y2(){
   Serial.print("To Box: ");
   Serial.println("16712445");
   Serial3.write("16712445.\r\n");
@@ -58,7 +58,7 @@ Box::y2(){
   delay(200);
 };
 
-Box::z1(){
+BOX::z1(){
   Serial.print("To Box: ");
   Serial.println("16720605");
   Serial3.write("16720605.\r\n");
@@ -66,7 +66,7 @@ Box::z1(){
   delay(200);
 };
 
-Box::z2(){
+BOX::z2(){
   Serial.print("To Box: ");
   Serial.println("16712445");
   Serial3.write("16712445.\r\n");
@@ -74,7 +74,7 @@ Box::z2(){
   delay(200);
 };
 
-Box::step(int s){
+BOX::step(int s){
   if(s==1){
     Serial.print("To Box: ");
     Serial.println("1001");
@@ -94,10 +94,9 @@ Box::step(int s){
     Serial3.flush();
     delay(200);    
   }
-
 };
 
-Box::reboot(){
+BOX::reboot(){
   Serial.print("To Box: ");
   Serial.println("16756815");
   Serial3.write("16756815.\r\n");
@@ -105,7 +104,7 @@ Box::reboot(){
   delay(200);
 };
 
-Box::enter(){
+BOX::enter(){
   Serial.print("To Box: ");
   Serial.println("16761405");
   Serial3.write("16761405.\r\n");
@@ -113,10 +112,16 @@ Box::enter(){
   delay(200);
 };
 
-Box::exit(){
+BOX::exit(){
   Serial.print("To Box: ");
   Serial.println("16748655");
   Serial3.write("16748655.\r\n");
+  Serial3.flush();
+  delay(200);
+};
+
+BOX::receiveDataOfMemory(){
+  Serial3.write("0000.\r\n");
   Serial3.flush();
   delay(200);
 };

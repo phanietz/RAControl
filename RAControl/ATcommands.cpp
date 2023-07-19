@@ -8,13 +8,14 @@
 #include "SendtoDisplay.h"
 #define ENABLE 9
 #define SIGNALink 53
+#define TIME_LINES 70
 
 AT::AT(){};
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-String AT::INQM(String param){
+String AT::inqm(String param){
   Serial.println("AT+INQM=1,9,8"); 
   do{
     responseAT="";
@@ -35,7 +36,7 @@ String AT::INQM(String param){
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-String AT::RESET(){
+String AT::reset(){
   Serial.println("AT+RESET"); 
   do{
     responseAT="";
@@ -56,7 +57,7 @@ String AT::RESET(){
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-String AT::INIT(){
+String AT::init(){
   Serial.println("AT+INIT");
   do{
     responseAT="";
@@ -81,7 +82,7 @@ String AT::INIT(){
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-String AT::INQ(bool mode, class Display &Dis){
+String AT::inq(bool mode, class HMI &Dis){
   Serial.println("AT+INQ"); 
   Serial3.write("AT+INQ\r\n");
   Serial3.flush();
@@ -117,7 +118,7 @@ String AT::INQ(bool mode, class Display &Dis){
     }
     if(responseAT.compareTo("OK\r\n")==0){ //when detect OK
 
-      Dis.ProgressBar(50);
+      Dis.progressBar(50);
 
       refreshCount++;
       if(auxEndMarker.compareTo("\nOK\r\n")!=0){ //verify that the sentence of the structure is correct
@@ -147,7 +148,7 @@ String AT::INQ(bool mode, class Display &Dis){
           Serial.print("Total bytes: ");
           Serial.println(text.length());
         }
-        Dis.ProgressBar(75);   
+        Dis.progressBar(75);   
       }
     }
   }while(auxEndMarker.compareTo("\nOK\r\n")!=0); //if is 4 means only read OK and not full data
@@ -211,7 +212,7 @@ String AT::INQ(bool mode, class Display &Dis){
     
   }else{
     ////////////////////================================= Send to Display: page SPASOn
-    Dis.ProgressBar(100);
+    Dis.progressBar(100);
     responseAT="Yes";
   }
 
@@ -221,7 +222,7 @@ String AT::INQ(bool mode, class Display &Dis){
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-String AT::LINK(int cell){
+String AT::link(int cell){
   Serial.println("AT+LINK");
 
   switch(cell){
@@ -246,6 +247,7 @@ String AT::LINK(int cell){
       break;                  
   }
   
+  findingCopy=0;
   Serial3.flush();
   do{
     responseAT="";
@@ -257,18 +259,23 @@ String AT::LINK(int cell){
     //Serial.println(responseAT.length());
     //Serial.println(responseAT);
     //Serial3.write("Master conected\r\n");
+    findingCopy++;
+    if(findingCopy >= TIME_LINES){
+      Serial.println("long time trying to link");
+      return "errorLINK OK";
+    }    
   }while(responseAT.indexOf("OK")==-1); //if its >= 0 means "OK" was received
 
-  //while(digitalRead(SIGNALink)==false){}
+  Serial.print("Lyne cycles: ");
+  Serial.println(findingCopy);
 
-  responseAT=responseAT.substring(0, responseAT.length()-2); //remove \r\n from command string
-  return String(Serial.println(responseAT));
+  return String(responseAT);
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-String AT::DISC(){
+String AT::disc(){
   Serial.println("AT+DISC");
   digitalWrite(ENABLE, LOW);
   delay(500);
@@ -296,8 +303,53 @@ String AT::DISC(){
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-bool AT::WaitCopy(){
-  //unsigned long time=0, auxtime=0;
+bool AT::axisReceiving(){
+  findingCopy=0;
+  //time = millis();
+  do{
+    responseAT="";
+    delay(100);
+    while(Serial3.available()>0){
+      a = char(Serial3.read());
+      responseAT += a;    
+    }
+
+    findingCopy++;
+    if(findingCopy >= TIME_LINES){
+      Serial.println("entra false");
+      error = 1;
+      return false;
+    }
+
+  }while(responseAT.indexOf("COPY\r\n")==-1); //if 0 means equal
+
+  Serial.print("Lyne cycles: ");
+  Serial.println(findingCopy);
+  Serial.println(responseAT);
+
+  if(responseAT.indexOf("{[")!=-1 and responseAT.indexOf("]}")!=-1){
+    for(i=0; i<3; i++){
+      if(i==0){
+        data=responseAT.substring(responseAT.indexOf("{")+1,responseAT.indexOf("}"));
+      }else{
+        data=data.substring(data.indexOf("][")+1,data.length());
+      }
+      axisStr[i]=data.substring(data.indexOf("[")+1,data.indexOf("]"));
+      axisNum[i]=axisStr[i].toFloat();
+      axisStr[i].replace(".","0");
+    }
+    return true;
+  }else{
+    error = 3;
+    return false;
+  }
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+String AT::waitData(int type){
+  findingCopy=0;
   //time = millis();
   do{
     responseAT="";
@@ -307,13 +359,26 @@ bool AT::WaitCopy(){
       responseAT += a;    
     }
     //Serial.println(responseAT.length());
-    Serial.println(responseAT);
-    /*auxtime = millis();
-    Serial.println(time-auxtime);
-    if(time-auxtime >= 4294965386){
-      return false;
-    }*/
+    //Serial.println(responseAT);
+    findingCopy++;
+    
+    if(findingCopy >= TIME_LINES){         ////////////////looooooook and change
+      Serial.println("entra false");
+      responseAT = "";
+      responseAT += "COPY\r\n";
+    }
+
   }while(responseAT.indexOf("COPY\r\n")==-1); //if 0 means equal
 
-  return true;
+  Serial.print("Lyne cycles: ");
+  Serial.println(findingCopy);
+
+  if(type==2){
+    data=responseAT.substring(responseAT.indexOf(".")-2,responseAT.indexOf(".")+3);
+    Serial.println(data);
+    data.replace(".","0");
+    Serial.println(data);    
+  }
+
+  return data;
 };

@@ -4,18 +4,21 @@
 #define SENDTODISPLAY_H
 #include <Arduino.h>
 
-class Display{
+class HMI{
   private:
     String responseAT="", param="";
     int i=0;
   public:
-    Display();
+    HMI();
     void refresh();
     void connect(int send);    
     void disconnect(int send);
-    void SendSystemsAvailables(bool mode, class AT &Blue);
-    void ProgressBar(int value);
+    void sendSystemsAvailables(bool mode, class AT &Blue);
+    void progressBar(int value);
     void menu(int state, class AT &Blue);
+    void firstDataUpdate(String a, String b, String c);
+    void dataPosition(int send, String axis);
+    void setDatafromMemorytoDisplay();
 };
 
 #endif

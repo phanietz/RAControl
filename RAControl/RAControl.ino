@@ -31,22 +31,12 @@ Role: 1 (master)
  //PUT 9600 BAUD TO SERIAL MONITOR
  //PUT 38400 BAUD TO SERIAL BLUETOOTH
 
- //PAIR to SLAVE SPAS_202
+#include "FromTouch.h"
+#define SIGNALINK 53
 
-#include "SendtoDisplay.h"
-#include "SendtoBox.h"
-#include "ATcommands.h"
-
-#define SIGNALink 53
-
-String data_from_nextion="", aux="";
-String responseAT;
-bool endwait=false, connected=false;
-void variables(String data_from_nextion);
-
-Display DisplayTouch;
-Box box;
-AT Bluetooth;
+String data_from_nextion, aux;
+void main2(String data_from_nextion);
+TOUCH ReceivingFromTouch;
 
 void setup(){
   pinMode(9, OUTPUT);
@@ -55,7 +45,7 @@ void setup(){
 
   pinMode(15, INPUT_PULLUP); //RX Serial 2 Bluetooth
   pinMode(17, INPUT_PULLUP); //RX Serial 3 NEXTION
-  pinMode(SIGNALink, INPUT_PULLUP); //LED 3 NEXTION
+  pinMode(SIGNALINK, INPUT_PULLUP); //LED 3 NEXTION
 
   Serial3.begin(38400);  // HC-05 default speed in AT command mode
   Serial2.begin(9600);  // NEXTION
@@ -72,7 +62,7 @@ void loop(){
     //Serial.println(aux);
     if(aux.endsWith(".")){
 
-      variables(data_from_nextion);   
+      main2(data_from_nextion);   
       data_from_nextion ="";      
 
     }else{
@@ -85,157 +75,85 @@ void loop(){
 
 }
 
-void variables(String data_from_nextion){
+void main2(String data_from_nextion){
 
   Serial.print("From Display: ");
-  Serial.println(data_from_nextion);
-  //Serial.println(data_from_nextion.length());                                                                                                                                                         
+  Serial.println(data_from_nextion);                                                                                                                                                   
 
-
-  if(data_from_nextion.indexOf("connectSPAS")!=-1 or data_from_nextion.indexOf("Refresh")!=-1){
-    DisplayTouch.refresh();
-    DisplayTouch.ProgressBar(10);
-    if(data_from_nextion.indexOf("connectSPAS")!=-1){
-      responseAT=Bluetooth.INQM("1,9,8");
-    }
-    DisplayTouch.ProgressBar(25);
-    responseAT=Bluetooth.RESET();
-    responseAT=Bluetooth.INIT();
-    DisplayTouch.ProgressBar(50);
-    responseAT=Bluetooth.INQ(false, DisplayTouch); //progress 50, 75 and 100
-
-    DisplayTouch.ProgressBar(75);
-    if(responseAT.compareTo("Yes")==0){
-      DisplayTouch.SendSystemsAvailables(true, Bluetooth);
-    }
+  if(data_from_nextion.indexOf("connectSPAS")!=-1){
+    ReceivingFromTouch.intoSPASystem(1);
   }
 
+  if(data_from_nextion.indexOf("Refresh")!=-1){
+    ReceivingFromTouch.intoSPASystem(0);
+  }
 
   if(data_from_nextion.indexOf("SPAS2")!=-1){
-    Serial.println("------CONECTAR-----");
-    DisplayTouch.connect(1);
-    DisplayTouch.ProgressBar(25);
-    if(data_from_nextion.indexOf("SPAS201")!=-1){
-      responseAT=Bluetooth.LINK(201);
-    }else if(data_from_nextion.indexOf("SPAS202")!=-1){
-      responseAT=Bluetooth.LINK(202);
-    }else if(data_from_nextion.indexOf("SPAS204")!=-1){
-      responseAT=Bluetooth.LINK(204);
-    }else if(data_from_nextion.indexOf("SPAS205")!=-1){
-      responseAT=Bluetooth.LINK(205);
-    }else if(data_from_nextion.indexOf("SPAS209")!=-1){
-      responseAT=Bluetooth.LINK(209);
-    }else if(data_from_nextion.indexOf("SPAS210")!=-1){
-      responseAT=Bluetooth.LINK(210);
-    }else if(data_from_nextion.indexOf("SPAS211")!=-1){
-      responseAT=Bluetooth.LINK(211);
-    }else if(data_from_nextion.indexOf("SPAS212")!=-1){
-      responseAT=Bluetooth.LINK(212);
-    }
-    
-    DisplayTouch.ProgressBar(50);
-    connected=Bluetooth.WaitCopy();
-    if(connected==true){
-      DisplayTouch.ProgressBar(75);
-      box.motor1();
-      DisplayTouch.connect(2);
-    }else{
-      Serial.println("ERROR trying to connect");
-    }
-
+    Serial.println(data_from_nextion.substring(data_from_nextion.indexOf("SPAS")+4, data_from_nextion.indexOf("SPAS")+7));
+    ReceivingFromTouch.intoBox(data_from_nextion, (data_from_nextion.substring(data_from_nextion.indexOf("SPAS")+4, data_from_nextion.indexOf("SPAS")+7)).toInt());
   }
-
 
   if(data_from_nextion.indexOf("Disconnect")!=-1){
-    Serial.println("------DESCONECTAR-----");
-    box.exit();
-    DisplayTouch.disconnect(1);
-    DisplayTouch.ProgressBar(25);
-    responseAT=Bluetooth.DISC();
-    DisplayTouch.ProgressBar(50);
-    DisplayTouch.disconnect(2);
-    DisplayTouch.SendSystemsAvailables(false, Bluetooth); 
-    DisplayTouch.ProgressBar(75);
+    ReceivingFromTouch.exitBox();
   }
-
 
   if(data_from_nextion.indexOf("exitMenu-access0")!=-1){
-    DisplayTouch.menu(0, Bluetooth);
-  }else if(data_from_nextion.indexOf("exitMenu-access1")!=-1){
-    DisplayTouch.SendSystemsAvailables(true, Bluetooth);
+    ReceivingFromTouch.exitMenu(1);
   }
   
-
-  //////////////////////////////////////////
-  ////////////INTO SPASystem////////////////
-  //////////////////////////////////////////
+  if(data_from_nextion.indexOf("exitMenu-access1")!=-1){
+    ReceivingFromTouch.exitMenu(2);
+  }
+  
   if(data_from_nextion.indexOf("SPASmotor1")!=-1){
-    box.motor1();
+    ReceivingFromTouch.motor(1);
   }
 
   if(data_from_nextion.indexOf("SPASmotor2")!=-1){
-    box.motor2();
+    ReceivingFromTouch.motor(2);
   }
 
   if(data_from_nextion.indexOf("SPASmotor3")!=-1){
-    box.motor3();
+    ReceivingFromTouch.motor(3);
   }
 
   if(data_from_nextion.indexOf("+x")!=-1){
-    box.x1();
+    ReceivingFromTouch.move(1,2);
   }
 
   if(data_from_nextion.indexOf("-x")!=-1){
-    box.x2();
+    ReceivingFromTouch.move(2,2); 
   }
 
   if(data_from_nextion.indexOf("+y")!=-1){
-    box.y1();
+    ReceivingFromTouch.move(3,3); 
   }
 
   if(data_from_nextion.indexOf("-y")!=-1){
-    box.y2();
+    ReceivingFromTouch.move(4,3); 
   }
 
   if(data_from_nextion.indexOf("+z")!=-1){
-    box.z1();
+    ReceivingFromTouch.move(5,1); 
   }
 
   if(data_from_nextion.indexOf("-z")!=-1){
-    box.z2();
+    ReceivingFromTouch.move(6,1); 
   }
 
   if(data_from_nextion.indexOf("StepL")!=-1){
-    box.step(1); 
+    ReceivingFromTouch.length(1);
   }
 
   if(data_from_nextion.indexOf("StepM")!=-1){
-    box.step(2);
+    ReceivingFromTouch.length(2);
   }
 
   if(data_from_nextion.indexOf("StepH")!=-1){
-    box.step(3);
+    ReceivingFromTouch.length(3);
   }
 
   if(data_from_nextion.indexOf("calibrate")!=-1){
-    endwait=false;
-    do{
-      if (Serial2.available()){    
-        aux = char(Serial2.read());
-        if(aux.endsWith(".")){
-          if(data_from_nextion.indexOf("Yes")!=-1){
-            box.reboot();
-            endwait=true;
-          }
-          if(data_from_nextion.indexOf("No")!=-1){
-            endwait=true;
-          }          
-          data_from_nextion ="";
-        }else{
-          data_from_nextion += aux;
-        }
-      }
-    }while(endwait==false);
-    Serial.println("Exit reboot");
+    ReceivingFromTouch.reboot(data_from_nextion);
   }        
 }

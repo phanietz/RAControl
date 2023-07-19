@@ -1,12 +1,12 @@
 #include "SendtoDisplay.h"
 #include "ATcommands.h"
 
-Display::Display(){};
+HMI::HMI(){};
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-void Display::refresh(){
+void HMI::refresh(){
   
   Serial2.print("page SPASsearching");
   Serial2.write(0xff);
@@ -18,7 +18,7 @@ void Display::refresh(){
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-void Display::SendSystemsAvailables(bool mode, class AT &Blue){
+void HMI::sendSystemsAvailables(bool mode, class AT &Blue){
   //AT Blue;
   Serial2.print("page SPASOn");
   Serial2.write(0xff);
@@ -66,29 +66,51 @@ void Display::SendSystemsAvailables(bool mode, class AT &Blue){
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-void Display::connect(int send){
-  ////////////////////================================= AT+LINK=XX,X,XXXXX
-  
-  if(send == 1){
+void HMI::connect(int send){
+
+  /*if(send == 0){
     Serial2.flush();
     Serial2.print("page SPASConDis");
     Serial2.write(0xff);
     Serial2.write(0xff);
     Serial2.write(0xff);
   }
-  if(send == 2){
+  if(send == 1){
     Serial2.flush();
     Serial2.print("page SPASmotor1");
     Serial2.write(0xff);
     Serial2.write(0xff);
     Serial2.write(0xff);
+  }*/
+
+  Serial2.flush();
+  switch(send){
+    case 0:
+      Serial2.print("page SPASConDis");
+    break;
+
+    case 1:
+      Serial2.print("page SPASmotor1");
+    break; 
+
+    case 2:
+      Serial2.print("page SPASmotor2");
+    break;     
+
+    case 3:
+      Serial2.print("page SPASmotor3");
+    break;         
   }
+  Serial2.write(0xff);
+  Serial2.write(0xff);
+  Serial2.write(0xff);
+
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-void Display::disconnect(int send){
+void HMI::disconnect(int send){
 
   if(send == 1){
     Serial2.flush();
@@ -109,7 +131,7 @@ void Display::disconnect(int send){
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-void Display::ProgressBar(int value){
+void HMI::progressBar(int value){
   switch(value){
     case 0:
       Serial2.print("ProgressBar.val=0");  
@@ -146,7 +168,7 @@ void Display::ProgressBar(int value){
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-void Display::menu(int state, class AT &Blue){
+void HMI::menu(int state, class AT &Blue){
 
   if(state==0){
     Serial2.print("page SPASsearching");  
@@ -181,4 +203,159 @@ void Display::menu(int state, class AT &Blue){
       Serial2.write(0xff);           
     }
   }
+};
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+void HMI::firstDataUpdate(String a, String b, String c){
+  String test="";
+  if(a.length()==5){
+    Serial2.print("dec1=2");
+    Serial2.write(0xff);
+    Serial2.write(0xff);
+    Serial2.write(0xff);    
+  }
+  if(b.length()==5){
+    Serial2.print("dec2=2");
+    Serial2.write(0xff);
+    Serial2.write(0xff);
+    Serial2.write(0xff);    
+  }
+  if(c.length()==5){
+    Serial2.print("dec3=2");
+    Serial2.write(0xff);
+    Serial2.write(0xff);
+    Serial2.write(0xff);    
+  }
+
+  test="Az="+a;
+  Serial2.print(test);
+  Serial2.write(0xff);
+  Serial2.write(0xff);
+  Serial2.write(0xff);    
+  test="Ax="+b;
+  Serial2.print(test);
+  Serial2.write(0xff);
+  Serial2.write(0xff);
+  Serial2.write(0xff);   
+  test="Ay="+c;
+  Serial2.print(test);
+  Serial2.write(0xff);
+  Serial2.write(0xff);
+  Serial2.write(0xff);               
+
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+void HMI::dataPosition(int send, String axis){
+  //1 = motor 1
+  //2 = motor 2
+  //3 = motor 3
+  //Serial.println(axis); //example format: 27.25 = 27025
+  Serial2.flush();
+  String test="";
+
+  switch(send){
+    case 1:
+            test="Az="+axis;
+            Serial2.print(test);
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            if(axis.length()==4){
+              Serial2.print("M1.vvs0=1");
+              Serial2.write(0xff);
+              Serial2.write(0xff);
+              Serial2.write(0xff);    
+              Serial2.print("dec1=1");
+              Serial2.write(0xff);
+              Serial2.write(0xff);
+              Serial2.write(0xff);  
+            }else{
+              Serial2.print("M1.vvs0=2");
+              Serial2.write(0xff);
+              Serial2.write(0xff);
+              Serial2.write(0xff);    
+              Serial2.print("dec1=2");    
+              Serial2.write(0xff);
+              Serial2.write(0xff);
+              Serial2.write(0xff);                
+            }
+            Serial2.print("M1.val=Az");
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);                            
+    break;
+
+    case 2:
+            test="Ax="+axis;
+            Serial2.print(test);
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);  
+            if(axis.length()==4){
+              Serial2.print("M2.vvs0=1");
+              Serial2.write(0xff);
+              Serial2.write(0xff);
+              Serial2.write(0xff);    
+              Serial2.print("dec2=1");
+              Serial2.write(0xff);
+              Serial2.write(0xff);
+              Serial2.write(0xff);  
+            }else{
+              Serial2.print("M2.vvs0=2");
+              Serial2.write(0xff);
+              Serial2.write(0xff);
+              Serial2.write(0xff);    
+              Serial2.print("dec2=2");    
+              Serial2.write(0xff);
+              Serial2.write(0xff);
+              Serial2.write(0xff);                
+            }
+            Serial2.print("M2.val=Ax");
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);        
+    break;
+
+    case 3:
+            String test="Ay="+axis;
+            Serial2.print(test);
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);  
+            if(axis.length()==4){
+              Serial2.print("M3.vvs0=1");
+              Serial2.write(0xff);
+              Serial2.write(0xff);
+              Serial2.write(0xff);    
+              Serial2.print("dec3=1");
+              Serial2.write(0xff);
+              Serial2.write(0xff);
+              Serial2.write(0xff);  
+            }else{
+              Serial2.print("M3.vvs0=2");
+              Serial2.write(0xff);
+              Serial2.write(0xff);
+              Serial2.write(0xff);    
+              Serial2.print("dec3=2");    
+              Serial2.write(0xff);
+              Serial2.write(0xff);
+              Serial2.write(0xff);                
+            }
+            Serial2.print("M3.val=Ay");
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);        
+    break;
+  }
+
+};
+
+void HMI::setDatafromMemorytoDisplay(){
+
 };
