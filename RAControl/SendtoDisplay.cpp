@@ -18,12 +18,131 @@ void HMI::refresh(){
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-void HMI::sendSystemsAvailables(bool mode, class AT &Blue){
+void HMI::sendSystemsAvailables(bool mode, class AT &Blue, int error){
   //AT Blue;
   Serial2.print("page SPASOn");
   Serial2.write(0xff);
   Serial2.write(0xff);
   Serial2.write(0xff); 
+
+  switch(error){
+    case 0:
+            Serial2.print("error=0");  
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);         
+            Serial2.print("vis msgerror,0");
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);        
+    break;
+
+    case 1:
+            Serial.println("SYSTEM OFF but system ON on display");
+            Serial2.print("p0.pic=53");
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.print("tsw m0,1");
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);  
+            Serial2.print("vis ProgressBar,0");  
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);      
+            Serial2.print("vis p1,1");  
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.print("vis Menu,1");  
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);    
+            Serial2.print("error=1");  
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.print("vis msgerror,0");
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+    break;
+
+    case 2:
+            Serial.println("ALL SYSTEMS ARE OFF");
+            Serial2.print("p0.pic=51");
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);   
+            Serial2.print("tsw m0,1");
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);  
+            Serial2.print("vis ProgressBar,0");  
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);      
+            Serial2.print("vis p1,1");  
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.print("vis Menu,1");  
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);    
+            Serial2.print("error=2");  
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);          
+            Serial2.print("vis msgerror,0");
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);          
+    break;
+
+    case 3:
+            Serial.println("Data incomplete broken");
+            Serial2.print("p0.pic=49");
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);     
+            Serial2.print("error=3");  
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);         
+            Serial2.print("vis msgerror,1");
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);    
+            Serial2.print("msgerror.txt=\"ERROR (3)\"");
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);                                            
+    break;
+
+    case 4:
+            Serial.print("ERROR: ");
+            Serial.println(Blue.error);
+            Serial.println("Many time trying to link");
+            Serial2.print("p0.pic=49");
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);     
+            Serial2.print("error=4");  
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);          
+            Serial2.print("vis msgerror,1");
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);     
+            Serial2.print("msgerror.txt=\"ERROR (4)\"");
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);                                          
+    break;
+  }
 
   for(i=0; i<5; i++){
     if(mode==true){      
@@ -33,6 +152,10 @@ void HMI::sendSystemsAvailables(bool mode, class AT &Blue){
     }
     if(Blue.SystemsON[i][1].compareTo("-ON")==0){
       Serial2.flush();
+      Serial2.print("vis s20"+String(i+1)+"off,0");
+      Serial2.write(0xff);
+      Serial2.write(0xff);
+      Serial2.write(0xff);                
       Serial2.print("vis s20"+String(i+1)+"on,1");
       Serial2.write(0xff);
       Serial2.write(0xff);
@@ -41,19 +164,36 @@ void HMI::sendSystemsAvailables(bool mode, class AT &Blue){
       Serial2.write(0xff);
       Serial2.write(0xff);
       Serial2.write(0xff);    
+    }else if(Blue.SystemsON[i][1].compareTo("-ERR")==0){
+      Serial2.flush();
+      Serial2.print("vis s20"+String(i+1)+"on,0");
+      Serial2.write(0xff);
+      Serial2.write(0xff);
+      Serial2.write(0xff);                
+      Serial2.print("vis s20"+String(i+1)+"off,1");
+      Serial2.write(0xff);
+      Serial2.write(0xff);
+      Serial2.write(0xff);                
+      Serial2.print("tsw t20"+String(i+1)+",1");  
+      Serial2.write(0xff);
+      Serial2.write(0xff);
+      Serial2.write(0xff);   
     }else{
       Serial2.flush();
       Serial2.print("vis s20"+String(i+1)+"on,0");
       Serial2.write(0xff);
       Serial2.write(0xff);
       Serial2.write(0xff);
+      Serial2.print("vis s20"+String(i+1)+"off,0");
+      Serial2.write(0xff);
+      Serial2.write(0xff);
+      Serial2.write(0xff);                
       Serial2.print("tsw t20"+String(i+1)+",0");
       Serial2.write(0xff);
       Serial2.write(0xff);
       Serial2.write(0xff);    
     }
   }
-
   //activar boton refresh
   Serial2.flush();
   Serial2.print("tsw m0,1");
@@ -180,7 +320,7 @@ void HMI::menu(int state, class AT &Blue){
     Serial2.write(0xff);
     Serial2.write(0xff); 
 
-    if(Blue.error=2){
+    if(Blue.error==2){
       Serial2.print("p0.pic=51");
       Serial2.write(0xff);
       Serial2.write(0xff);

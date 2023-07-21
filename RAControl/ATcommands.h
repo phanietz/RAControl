@@ -1,9 +1,9 @@
 //The communication with the BLUETOOTH is through Serial3
 //ERROR MEANING
 //error = 0   working good
-//error = 1   CONNECTION FAILED, something is going wrong with the communication
+//error = 1   CONNECTION FAILED, something is going wrong with the communication, Try one more time
 //error = 2   NO SYSTEMS DETECTED, verify at least one of system is ON
-//error = 3   INCOMPLETE RECEIVED DATA, Try one more time manually
+//error = 3   INCOMPLETE RECEIVED DATA, Try one more time manually, means user can see loss conection and needs try again
 #ifndef ATCOMMANDS_H
 #define ATCOMMANDS_H
 #include <Arduino.h>

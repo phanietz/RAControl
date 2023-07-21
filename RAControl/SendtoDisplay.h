@@ -13,7 +13,7 @@ class HMI{
     void refresh();
     void connect(int send);    
     void disconnect(int send);
-    void sendSystemsAvailables(bool mode, class AT &Blue);
+    void sendSystemsAvailables(bool mode, class AT &Blue, int error);
     void progressBar(int value);
     void menu(int state, class AT &Blue);
     void firstDataUpdate(String a, String b, String c);

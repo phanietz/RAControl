@@ -1,14 +1,8 @@
-//FROM ARDUINO TO NEXTION:
-//https://www.youtube.com/watch?v=mEbGVZJjKbs
-
-//FROM NEXTION TO ARDUINO:
-//https://www.youtube.com/watch?v=sNe-lkVQhqI
-
 #include "ATcommands.h"
 #include "SendtoDisplay.h"
 #define ENABLE 9
 #define SIGNALink 53
-#define TIME_LINES 70
+#define TIME_LINES 100
 
 AT::AT(){};
 
@@ -37,6 +31,10 @@ String AT::inqm(String param){
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 String AT::reset(){
+  digitalWrite(ENABLE, LOW);
+  delay(500);
+  digitalWrite(ENABLE, HIGH);
+  delay(500);
   Serial.println("AT+RESET"); 
   do{
     responseAT="";
@@ -125,6 +123,8 @@ String AT::inq(bool mode, class HMI &Dis){
         if(refreshCount>=2){
           if(mode==true){
             Serial.println("****Maximum search cycle time was reached****");
+            //ERROR 3
+            //error=3; //It did not programed
           }
           break; //finish search for bluetooth issue
         }else{
@@ -178,45 +178,17 @@ String AT::inq(bool mode, class HMI &Dis){
     Serial.println(on);
   }
 
-  responseAT=responseAT.substring(0, responseAT.length()-2); //remove \r\n from command string
-  Serial.println(responseAT);
-
   if(on==0){
-    //No ON systems
-    Serial2.print("p0.pic=51");
-    Serial2.write(0xff);
-    Serial2.write(0xff);
-    Serial2.write(0xff);   
-    Serial2.print("tsw m0,1");
-    Serial2.write(0xff);
-    Serial2.write(0xff);
-    Serial2.write(0xff);  
-    Serial2.print("vis ProgressBar,0");  
-    Serial2.write(0xff);
-    Serial2.write(0xff);
-    Serial2.write(0xff);      
-    Serial2.print("vis p1,1");  
-    Serial2.write(0xff);
-    Serial2.write(0xff);
-    Serial2.write(0xff);
-    Serial2.print("vis Menu,1");  
-    Serial2.write(0xff);
-    Serial2.write(0xff);
-    Serial2.write(0xff);    
-    Serial2.print("error=2");  
-    Serial2.write(0xff);
-    Serial2.write(0xff);
-    Serial2.write(0xff); 
-    error=2;    
-    responseAT="No";
-    
+    //ALL systems are OFF
+    error=2;
   }else{
-    ////////////////////================================= Send to Display: page SPASOn
     Dis.progressBar(100);
-    responseAT="Yes";
+    error=0; //At least one system ON
   }
 
-  return responseAT;
+  responseAT=responseAT.substring(0, responseAT.length()-2); //remove \r\n from command string
+
+  return String(Serial.println(responseAT));
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -262,11 +234,13 @@ String AT::link(int cell){
     findingCopy++;
     if(findingCopy >= TIME_LINES){
       Serial.println("long time trying to link");
+      error=4; 
       return "errorLINK OK";
     }    
   }while(responseAT.indexOf("OK")==-1); //if its >= 0 means "OK" was received
 
-  Serial.print("Lyne cycles: ");
+  error=0;
+  Serial.print("Line cycles: ");
   Serial.println(findingCopy);
 
   return String(responseAT);
@@ -316,8 +290,8 @@ bool AT::axisReceiving(){
 
     findingCopy++;
     if(findingCopy >= TIME_LINES){
-      Serial.println("entra false");
-      error = 1;
+      Serial.println("Time_lines exceded");
+      error=1;
       return false;
     }
 
@@ -338,9 +312,10 @@ bool AT::axisReceiving(){
       axisNum[i]=axisStr[i].toFloat();
       axisStr[i].replace(".","0");
     }
+    error=0;
     return true;
   }else{
-    error = 3;
+    error=3;
     return false;
   }
 };
@@ -370,7 +345,7 @@ String AT::waitData(int type){
 
   }while(responseAT.indexOf("COPY\r\n")==-1); //if 0 means equal
 
-  Serial.print("Lyne cycles: ");
+  Serial.print("Line cycles: ");
   Serial.println(findingCopy);
 
   if(type==2){

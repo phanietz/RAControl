@@ -21,12 +21,10 @@ void TOUCH::intoSPASystem(int search){
   responseAT=Bluetooth.reset();
   responseAT=Bluetooth.init();
   SendToDisplay.progressBar(50);
-  responseAT=Bluetooth.inq(false, SendToDisplay); //progress 50, 75 and 100
-
+  responseAT=Bluetooth.inq(false, SendToDisplay); //get errors: 0 or 2
   SendToDisplay.progressBar(75);
-  if(responseAT.compareTo("Yes")==0){
-    SendToDisplay.sendSystemsAvailables(true, Bluetooth);
-  }  
+  SendToDisplay.sendSystemsAvailables(true, Bluetooth, Bluetooth.error);
+
 }
 
 
@@ -35,6 +33,7 @@ void TOUCH::intoBox(String fromNextion, int cell){
   SendToDisplay.connect(0);
   SendToDisplay.progressBar(25);
 
+  //get errors: 0 or 4
   switch(cell){
     case 201:
             Bluetooth.system=201;
@@ -76,31 +75,66 @@ void TOUCH::intoBox(String fromNextion, int cell){
     break;         
   }
   
-  SendToDisplay.progressBar(50);
-  if(responseAT.indexOf("errorLINK")!=-1){
-    Serial.println("ERROR trying to LINK, wrong response");
+  if(Bluetooth.error==0){ 
+    SendToDisplay.progressBar(50); 
+    //get errors: 0, 1 or 3
+    connected=Bluetooth.axisReceiving(); //receive axis from box and then COPY
+    if(Bluetooth.error==0){
+      for(i=0; i<5; i++){
+        if(Bluetooth.SystemsON[i][2].indexOf(String(Bluetooth.system))!=-1){
+          Bluetooth.SystemsON[i][1]="-ON";
+        }
+      };
+      Serial.println("SUCCESSFUL CONNECTION");
+      SendToDisplay.progressBar(75);
+      Box.motor1();
+      SendToDisplay.firstDataUpdate(Bluetooth.axisStr[0], Bluetooth.axisStr[1], Bluetooth.axisStr[2]);
+      SendToDisplay.connect(1);
+      Bluetooth.step=0.50;
+
+    }
   }
   
-  connected=Bluetooth.axisReceiving(); //receive axis from box and then COPY
 
-  if(connected==true){
-    Serial.println("SUCCESSFUL CONNECTION");
-    SendToDisplay.progressBar(75);
-    Box.motor1();
-    SendToDisplay.firstDataUpdate(Bluetooth.axisStr[0], Bluetooth.axisStr[1], Bluetooth.axisStr[2]);
-    SendToDisplay.connect(1);
-    Bluetooth.step=0.50;
+  if(Bluetooth.error!=0){ //ERROR trying to LINK
+      Serial.print("ERROR: ");
+      Serial.println(Bluetooth.error);
+      switch(Bluetooth.error){//*********************************
+        case 1: //put system to color gray (OFF)
+                for(i=0; i<5; i++){
+                  if(Bluetooth.SystemsON[i][2].indexOf(String(Bluetooth.system))!=-1){
+                    Bluetooth.SystemsON[i][1]="-OFF";
+                  }
+                };
+                Serial.println("CONNECTION FAILED");
+                //Bluetooth.disc();
 
-  }else{
-    Serial.println("ERROR trying to connect, System offline");
-    int i=0;
-    for(i=0; i<5; i++){
-      if(Bluetooth.SystemsON[i][2].indexOf(String(Bluetooth.system))!=-1){
-        Bluetooth.SystemsON[i][1]="-OFF";
+        break;
+
+        case 3: //put system to color red (ERROR)
+                for(i=0; i<5; i++){
+                  if(Bluetooth.SystemsON[i][2].indexOf(String(Bluetooth.system))!=-1){
+                    Bluetooth.SystemsON[i][1]="-ERR";
+                  }
+                };                
+                Serial.println("INCOMPLETE RECEIVED DATA");
+                Bluetooth.disc();
+        break;
+
+        case 4:
+                //put system to color red (ERROR)
+                for(i=0; i<5; i++){
+                  if(Bluetooth.SystemsON[i][2].indexOf(String(Bluetooth.system))!=-1){
+                    Bluetooth.SystemsON[i][1]="-ERR";
+                  }
+                };                
+                Serial.println("ERROR trying to LINK");
+                Bluetooth.disc();
+        break;
       }
-    };
-    SendToDisplay.sendSystemsAvailables(false, Bluetooth); 
+      SendToDisplay.sendSystemsAvailables(false, Bluetooth, Bluetooth.error);     
   }
+
 }
 
 void TOUCH::exitBox(){
@@ -111,7 +145,8 @@ void TOUCH::exitBox(){
   responseAT=Bluetooth.disc();
   SendToDisplay.progressBar(50);
   SendToDisplay.disconnect(2);
-  SendToDisplay.sendSystemsAvailables(false, Bluetooth); 
+  Bluetooth.error = 0;
+  SendToDisplay.sendSystemsAvailables(false, Bluetooth, Bluetooth.error); 
   SendToDisplay.progressBar(75);  
 }
 
@@ -123,7 +158,7 @@ void TOUCH::exitMenu(int e){
     break;
 
     case 2:
-            SendToDisplay.sendSystemsAvailables(true, Bluetooth);
+            SendToDisplay.sendSystemsAvailables(true, Bluetooth, Bluetooth.error);
     break;
   }
 
