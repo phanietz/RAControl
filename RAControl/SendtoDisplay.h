@@ -19,6 +19,7 @@ class HMI{
     void firstDataUpdate(String a, String b, String c);
     void dataPosition(int send, String axis);
     void setDatafromMemorytoDisplay();
+    void picture(String pic);
 };
 
 #endif

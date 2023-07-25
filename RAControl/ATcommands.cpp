@@ -357,3 +357,25 @@ String AT::waitData(int type){
 
   return data;
 };
+
+bool AT::waitCopy(){
+  findingCopy=0;
+  do{
+    responseAT="";
+    delay(100);
+    while(Serial3.available()>0){
+      a = char(Serial3.read());
+      responseAT += a;
+    }
+    //Serial.println(responseAT.length());
+    //Serial.println(responseAT);
+    findingCopy++;
+    
+    if(findingCopy >= 500){         ////////////////looooooook and change
+      Serial.println("entra false");
+      return true;
+    }
+  }while(responseAT.indexOf("COPY\r\n")==-1); //if 0 means equal
+
+  return true;
+};

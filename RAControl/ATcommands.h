@@ -40,6 +40,7 @@ class AT{
     String disc();
     bool axisReceiving();
     String waitData(int type);
+    bool waitCopy();
 };
 
 #endif

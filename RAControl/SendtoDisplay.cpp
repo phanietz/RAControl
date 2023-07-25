@@ -281,19 +281,30 @@ void HMI::progressBar(int value){
     break;   
     case 25:
       Serial2.print("ProgressBar.val=25");
-    break;     
+    break;  
+
+    case 30:
+      Serial2.print("ProgressBar.val=30");
+    break; 
+
     case 35:
       Serial2.print("ProgressBar.val=35");
     break;
     case 50:
       Serial2.print("ProgressBar.val=50"); 
     break;
+    case 60:
+      Serial2.print("ProgressBar.val=60");
+    break;       
     case 70:
       Serial2.print("ProgressBar.val=70"); 
     break;
     case 75:
       Serial2.print("ProgressBar.val=75");
     break;
+    case 90:
+      Serial2.print("ProgressBar.val=90");
+    break;   
     case 100:
       Serial2.print("ProgressBar.val=100"); 
     break;
@@ -386,7 +397,7 @@ void HMI::firstDataUpdate(String a, String b, String c){
   Serial2.write(0xff);
   Serial2.write(0xff);               
 
-}
+};
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -498,4 +509,12 @@ void HMI::dataPosition(int send, String axis){
 
 void HMI::setDatafromMemorytoDisplay(){
 
+};
+
+void HMI::picture(String pic){
+  pic = "p0.pic="+pic;
+  Serial2.print(pic);
+  Serial2.write(0xff);
+  Serial2.write(0xff);
+  Serial2.write(0xff); 
 };

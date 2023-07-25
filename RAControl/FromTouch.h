@@ -5,8 +5,8 @@
 class TOUCH{
   private:
     String responseAT, aux="";
-    bool endwait=false, connected=false;
-    int i=0;
+    bool endwait=false, connected=false, exit=false;
+    int i=0, motorIndex=0;
   public:
     TOUCH();
     void intoSPASystem(int search);
