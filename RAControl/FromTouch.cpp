@@ -27,7 +27,6 @@ void TOUCH::intoSPASystem(int search){
 
 }
 
-
 void TOUCH::intoBox(String fromNextion, int cell){
   Serial.println("CONNECTING... TO ");
   SendToDisplay.connect(0);
@@ -92,7 +91,6 @@ void TOUCH::intoBox(String fromNextion, int cell){
       SendToDisplay.firstDataUpdate(Bluetooth.axisStr[0], Bluetooth.axisStr[1], Bluetooth.axisStr[2]);
       SendToDisplay.connect(1);
       Bluetooth.step=0.50;
-
     }
   }
   
@@ -307,28 +305,7 @@ void TOUCH::length(int l){
 }
 
 void TOUCH::reboot(String fromNextion){
-/*
-  endwait=false;
-  do{
-    if (Serial2.available()){    
-      aux = char(Serial2.read());
-      if(aux.endsWith(".")){
-        if(fromNextion.indexOf("Yes")!=-1){
-          Box.reboot();
-          endwait=true;
 
-        }else if(fromNextion.indexOf("No")!=-1){
-
-          endwait=true;
-        }          
-        fromNextion ="";
-      }else{
-        fromNextion += aux;
-      }
-    }
-  }while(endwait==false);
-  Serial.println("Exit reboot");
-*/
   aux="";
   fromNextion="";
   do{

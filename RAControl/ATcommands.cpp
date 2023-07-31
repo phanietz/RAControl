@@ -240,7 +240,7 @@ String AT::link(int cell){
   }while(responseAT.indexOf("OK")==-1); //if its >= 0 means "OK" was received
 
   error=0;
-  Serial.print("Line cycles: ");
+  Serial.print("Line cycles (linking): ");
   Serial.println(findingCopy);
 
   return String(responseAT);
@@ -290,14 +290,14 @@ bool AT::axisReceiving(){
 
     findingCopy++;
     if(findingCopy >= TIME_LINES){
-      Serial.println("Time_lines exceded");
+      Serial.println("Time exceeded when receiving the axis");
       error=1;
       return false;
     }
 
   }while(responseAT.indexOf("COPY\r\n")==-1); //if 0 means equal
 
-  Serial.print("Lyne cycles: ");
+  Serial.print("Lyne cycles (axis): ");
   Serial.println(findingCopy);
   Serial.println(responseAT);
 
@@ -345,7 +345,7 @@ String AT::waitData(int type){
 
   }while(responseAT.indexOf("COPY\r\n")==-1); //if 0 means equal
 
-  Serial.print("Line cycles: ");
+  Serial.print("Line cycles (wait data): ");
   Serial.println(findingCopy);
 
   if(type==2){
@@ -371,7 +371,7 @@ bool AT::waitCopy(){
     //Serial.println(responseAT);
     findingCopy++;
     
-    if(findingCopy >= 500){         ////////////////looooooook and change
+    if(findingCopy >= 300){         ////////////////looooooook and change
       Serial.println("entra false");
       return true;
     }
