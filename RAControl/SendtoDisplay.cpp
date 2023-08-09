@@ -26,10 +26,7 @@ void HMI::sendSystemsAvailables(bool mode, class AT &Blue, int error){
   Serial2.write(0xff); 
 
   if(error==1 or error==3 or error==4){
-    Serial2.print("p0.pic=49");
-    Serial2.write(0xff);
-    Serial2.write(0xff);
-    Serial2.write(0xff); 
+    picture("49");
     Serial2.print("vis errornumber,1");
     Serial2.write(0xff);
     Serial2.write(0xff);
@@ -39,15 +36,9 @@ void HMI::sendSystemsAvailables(bool mode, class AT &Blue, int error){
     Serial2.write(0xff);
     Serial2.write(0xff);      
   }else if(error==2){
-    Serial2.print("p0.pic=51");
-    Serial2.write(0xff);
-    Serial2.write(0xff);
-    Serial2.write(0xff);    
+    picture("51");
   }else if(error==0){
-    Serial2.print("p0.pic=53");
-    Serial2.write(0xff);
-    Serial2.write(0xff);
-    Serial2.write(0xff);       
+    picture("53");    
   }
 
   Serial2.print("tsw m0,1");
@@ -213,21 +204,6 @@ void HMI::sendSystemsAvailables(bool mode, class AT &Blue, int error){
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 void HMI::connect(int send){
 
-  /*if(send == 0){
-    Serial2.flush();
-    Serial2.print("page SPASConDis");
-    Serial2.write(0xff);
-    Serial2.write(0xff);
-    Serial2.write(0xff);
-  }
-  if(send == 1){
-    Serial2.flush();
-    Serial2.print("page SPASmotor1");
-    Serial2.write(0xff);
-    Serial2.write(0xff);
-    Serial2.write(0xff);
-  }*/
-
   Serial2.flush();
   switch(send){
     case 0:
@@ -337,10 +313,7 @@ void HMI::menu(int state, class AT &Blue){
     Serial2.write(0xff); 
 
     if(Blue.error==2){
-      Serial2.print("p0.pic=51");
-      Serial2.write(0xff);
-      Serial2.write(0xff);
-      Serial2.write(0xff);   
+      picture("51");
       Serial2.print("tsw m0,1");
       Serial2.write(0xff);
       Serial2.write(0xff);
@@ -365,7 +338,7 @@ void HMI::menu(int state, class AT &Blue){
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-void HMI::firstDataUpdate(String a, String b, String c){
+void HMI::firstDataUpdate(String a, String b, String c, int s[3][2]){
   String test="";
   if(a.length()==5){
     Serial2.print("dec1=2");
@@ -400,7 +373,84 @@ void HMI::firstDataUpdate(String a, String b, String c){
   Serial2.print(test);
   Serial2.write(0xff);
   Serial2.write(0xff);
-  Serial2.write(0xff);               
+  Serial2.write(0xff);
+
+  for(i=0; i<3; i++){
+    if(s[i][0] == 1 and s[i][1] == 1){
+      //error no pueden ser ambos 1.
+    }else{
+      if(s[i][0] == 1){
+        switch(i){
+          case 0: //z
+            Serial2.print("z=1");
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);   
+          break;
+
+          case 1: //x
+            Serial2.print("x=1");
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);  
+          break;
+
+          case 2: //y
+            Serial2.print("y=1");
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);  
+          break;
+        }
+      }else if(s[i][1] == 1){
+        switch(i){
+          case 0: //z
+            Serial2.print("z=2");
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);   
+          break;
+
+          case 1: //x
+            Serial2.print("x=2");
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);  
+          break;
+
+          case 2: //y
+            Serial2.print("y=2");
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);  
+          break;
+        }
+      }else{
+        switch(i){
+          case 0: //z
+            Serial2.print("z=0");
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);   
+          break;
+
+          case 1: //x
+            Serial2.print("x=0");
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);  
+          break;
+
+          case 2: //y
+            Serial2.print("y=0");
+            Serial2.write(0xff);
+            Serial2.write(0xff);
+            Serial2.write(0xff);  
+          break;
+        }
+      }
+    }
+  }
 
 };
 
@@ -512,9 +562,6 @@ void HMI::dataPosition(int send, String axis){
 
 };
 
-void HMI::setDatafromMemorytoDisplay(){
-
-};
 
 void HMI::picture(String pic){
   pic = "p0.pic="+pic;
@@ -522,4 +569,81 @@ void HMI::picture(String pic){
   Serial2.write(0xff);
   Serial2.write(0xff);
   Serial2.write(0xff); 
+};
+
+
+void HMI::endOfWheel(int end){
+
+  switch(end){
+    case 1:
+      picture("62");
+      Serial2.print("z=1");
+      Serial2.write(0xff);
+      Serial2.write(0xff);
+      Serial2.write(0xff);
+    break;
+
+    case 2:
+      picture("59");
+      Serial2.print("z=2");
+      Serial2.write(0xff);
+      Serial2.write(0xff);
+      Serial2.write(0xff);
+    break;
+
+    case 3:
+      picture("69");
+      Serial2.print("x=1");
+      Serial2.write(0xff);
+      Serial2.write(0xff);
+      Serial2.write(0xff);
+    break;
+
+    case 4:
+      picture("66");
+      Serial2.print("x=2");
+      Serial2.write(0xff);
+      Serial2.write(0xff);
+      Serial2.write(0xff);
+    break;
+
+    case 5:
+      picture("76");
+      Serial2.print("y=1");
+      Serial2.write(0xff);
+      Serial2.write(0xff);
+      Serial2.write(0xff);
+    break;
+
+    case 6:
+      picture("73");
+      Serial2.print("y=2");
+      Serial2.write(0xff);
+      Serial2.write(0xff);
+      Serial2.write(0xff);
+    break;
+  }
+
+};
+
+void HMI::activeDeactiveTouch(String button, bool state){
+  param = "";
+  param = "tsw " + button + ",";
+  switch(state){
+    case true:
+      param = param + "1";
+      Serial2.print(param);
+      Serial2.write(0xff);
+      Serial2.write(0xff);
+      Serial2.write(0xff);
+    break;
+
+    case false:
+      param = param + "0";
+      Serial2.print(param);
+      Serial2.write(0xff);
+      Serial2.write(0xff);
+      Serial2.write(0xff);
+    break;
+  }
 };

@@ -30,6 +30,11 @@ class AT{
     float step=0;
     float axisNum[3]={00.00,00.00,00.00};
     String axisStr[3]={"00.00","00.00","00.00"};
+    int switches[3][2]={
+      {0,0},
+      {0,0},
+      {0,0}
+    };
   public:
     AT();
     String inqm(String param);
@@ -38,9 +43,10 @@ class AT{
     String inq(bool mode, class HMI &Dis);
     String link(int cell);
     String disc();
-    bool axisReceiving();
+    bool axisReceiving(); //{[axis1;z1;z2][axis2;x1;x2][axis3;y1;y2]}
     String waitData(int type);
     bool waitCopy();
+    bool endOfpinWheel();
 };
 
 #endif

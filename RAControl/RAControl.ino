@@ -117,29 +117,31 @@ void main2(String data_from_nextion){
     ReceivingFromTouch.motor(3);
   }
 
-  if(data_from_nextion.indexOf("+x")!=-1){
-    ReceivingFromTouch.move(1,2);
+  if(data_from_nextion.indexOf("+z")!=-1){ //UP
+    ReceivingFromTouch.move(1,1); //z1
   }
 
-  if(data_from_nextion.indexOf("-x")!=-1){
-    ReceivingFromTouch.move(2,2); 
+  if(data_from_nextion.indexOf("-z")!=-1){ //DOWN
+    ReceivingFromTouch.move(2,1); //z2
   }
 
-  if(data_from_nextion.indexOf("+y")!=-1){
-    ReceivingFromTouch.move(3,3); 
+  if(data_from_nextion.indexOf("+x")!=-1){ //FORWARD
+    ReceivingFromTouch.move(3,2); //x1
   }
 
-  if(data_from_nextion.indexOf("-y")!=-1){
-    ReceivingFromTouch.move(4,3); 
+  if(data_from_nextion.indexOf("-x")!=-1){ //BACKWARD
+    ReceivingFromTouch.move(4,2); //x2
   }
 
-  if(data_from_nextion.indexOf("+z")!=-1){
-    ReceivingFromTouch.move(5,1); 
+  if(data_from_nextion.indexOf("+y")!=-1){ //LEFT
+    ReceivingFromTouch.move(5,3); //y1
   }
 
-  if(data_from_nextion.indexOf("-z")!=-1){
-    ReceivingFromTouch.move(6,1); 
+  if(data_from_nextion.indexOf("-y")!=-1){ //RIGHT
+    ReceivingFromTouch.move(6,3); //y2
   }
+
+
 
   if(data_from_nextion.indexOf("StepL")!=-1){
     ReceivingFromTouch.length(1);

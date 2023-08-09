@@ -16,10 +16,11 @@ class HMI{
     void sendSystemsAvailables(bool mode, class AT &Blue, int error);
     void progressBar(int value);
     void menu(int state, class AT &Blue);
-    void firstDataUpdate(String a, String b, String c);
+    void firstDataUpdate(String a, String b, String c, int s[3][2]);
     void dataPosition(int send, String axis);
-    void setDatafromMemorytoDisplay();
     void picture(String pic);
+    void endOfWheel(int end);
+    void activeDeactiveTouch(String button, bool state);
 };
 
 #endif

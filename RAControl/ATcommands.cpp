@@ -278,8 +278,9 @@ String AT::disc(){
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 bool AT::axisReceiving(){
+  //{[axis1;z1;z2][axis2;x1;x2][axis3;y1;y2]}
+  
   findingCopy=0;
-  //time = millis();
   do{
     responseAT="";
     delay(100);
@@ -301,6 +302,7 @@ bool AT::axisReceiving(){
   Serial.println(findingCopy);
   Serial.println(responseAT);
 
+  
   if(responseAT.indexOf("{[")!=-1 and responseAT.indexOf("]}")!=-1){
     for(i=0; i<3; i++){
       if(i==0){
@@ -308,9 +310,16 @@ bool AT::axisReceiving(){
       }else{
         data=data.substring(data.indexOf("][")+1,data.length());
       }
-      axisStr[i]=data.substring(data.indexOf("[")+1,data.indexOf("]"));
+
+      Serial.println(data); //{[axis1;z1;z2][axis2;x1;x2][axis3;y1;y2]}
+      axisStr[i]=data.substring(data.indexOf("[")+1,data.indexOf("]")-4);
+      switches[i][0]=(data.substring(data.indexOf(";")+1,data.indexOf(";")+2)).toInt();
+      switches[i][1]=(data.substring(data.indexOf(";")+4,data.indexOf("]")-1)).toInt();
       axisNum[i]=axisStr[i].toFloat();
       axisStr[i].replace(".","0");
+      Serial.println(axisStr[i]);
+      Serial.println(switches[i][0]);
+      Serial.println(switches[i][1]);
     }
     error=0;
     return true;
@@ -378,4 +387,33 @@ bool AT::waitCopy(){
   }while(responseAT.indexOf("COPY\r\n")==-1); //if 0 means equal
 
   return true;
+};
+
+bool AT::endOfpinWheel(){
+  findingCopy=0;
+  while(true){
+    responseAT="";
+    delay(100);
+    while(Serial3.available()>0){
+      a = char(Serial3.read());
+      responseAT += a;
+    }
+    //Serial.println(responseAT);
+    //Serial.println(responseAT.indexOf("CLOSE\r\n"));
+    //Serial.println(responseAT.indexOf("OPEN\r\n"));
+    if(responseAT.indexOf("CLOSE\r\n")>0){
+      //Serial.println("SWITCH CLOSE");
+      return false;
+    }
+    if(responseAT.indexOf("OPEN\r\n")>0){
+      //Serial.println("SWITCH OPEN");
+      return true;
+    }
+    findingCopy++;   
+    if(findingCopy >= 300){ 
+      Serial.println("entra false");
+      return false;
+    }
+  }
+  
 };
