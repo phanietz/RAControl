@@ -185,26 +185,45 @@ void TOUCH::motor(int m){
 }
 
 void TOUCH::move(int m, int motor){
+  Serial.print(Bluetooth.switches[0][0]); //m1 z1
+  Serial.println(Bluetooth.switches[0][1]); //m1 z2
+  Serial.print(Bluetooth.switches[1][0]); //m2 x1
+  Serial.println(Bluetooth.switches[1][1]); //m2 x2
+  Serial.print(Bluetooth.switches[2][0]); //m3 y1
+  Serial.println(Bluetooth.switches[2][1]); //m3 y2
+
   float aux2;
   switch(m){
-    case 1: //UP MOTOR 1 
+    case 1: //UP MOTOR 1     switches[0][0]=switch 1         switches[0][1]=switch 2
       Box.z1();
       if(Bluetooth.endOfpinWheel()==true){
-        Serial.println("switch open");
-        Bluetooth.axisNum[0]=Bluetooth.axisNum[0]+Bluetooth.step;
-        Bluetooth.axisStr[0]=String(Bluetooth.axisNum[0]);
-        Bluetooth.axisStr[0].replace(".","0");           
-        SendToDisplay.dataPosition(1,Bluetooth.axisStr[0]);
-        SendToDisplay.activeDeactiveTouch("plusZ", true);
-        Serial.println(Bluetooth.axisNum[0]);
-      }else{
-        Serial.println("switch close");
-        SendToDisplay.endOfWheel(1);
-        SendToDisplay.activeDeactiveTouch("plusZ", false);
+        if(Bluetooth.switches[0][0]==0){ //z1 open
+          Serial.println("switch open");
+          //changing number on touch screen
+          Bluetooth.axisNum[0]=Bluetooth.axisNum[0]+Bluetooth.step;
+          Bluetooth.axisStr[0]=String(Bluetooth.axisNum[0]);
+          Bluetooth.axisStr[0].replace(".","0");     
+          SendToDisplay.dataPosition(1,Bluetooth.axisStr[0]); //put new number
+////////////////////////////////////////////////////// im hereeeee
+          //verify if there is any change in the switches state (both switches)
+          SendToDisplay.activeDeactiveTouch("plusZ", true);
+          if(Bluetooth.switches[0][1]==0){
+            SendToDisplay.activeDeactiveTouch("lessZ", true); 
+          }else{
+            SendToDisplay.activeDeactiveTouch("lessZ", false); 
+          }
+          Serial.println(Bluetooth.axisNum[0]);
+        }else{ //z1 closed
+          Serial.println("switch close");
+          SendToDisplay.endOfWheel(1);
+          SendToDisplay.activeDeactiveTouch("plusZ", false);          
+        }
+      }else{ //Comunication error
+        Serial.println("COMUNICATION ERROR");
       }   
     break;    
 
-    case 2: //DOWN MOTOR 1        
+    case 2: //DOWN MOTOR 1     switches[0][0]=switch 1         switches[0][1]=switch 2
       Box.z2();
       if(Bluetooth.endOfpinWheel()==true){
         Serial.println("switch open");
@@ -221,7 +240,7 @@ void TOUCH::move(int m, int motor){
       }  
     break;    
 
-    case 3: //FORWARD MOTOR 2
+    case 3: //FORWARD MOTOR 2     switches[1][0]=switch 1         switches[1][1]=switch 2
       Box.x1();
       if(Bluetooth.endOfpinWheel()==true){
         Serial.println("switch open");
@@ -238,7 +257,7 @@ void TOUCH::move(int m, int motor){
       }  
     break;
 
-    case 4: //BACKWARD MOTOR 2
+    case 4: //BACKWARD MOTOR 2     switches[1][0]=switch 1         switches[1][1]=switch 2
       Box.x2();
       if(Bluetooth.endOfpinWheel()==true){
         Serial.println("switch open");
@@ -257,7 +276,7 @@ void TOUCH::move(int m, int motor){
       }
     break;
 
-    case 5: //LEFT MOTOR 3     
+    case 5: //LEFT MOTOR 3     switches[2][0]=switch 1         switches[2][1]=switch 2
       Box.y1();
       if(Bluetooth.endOfpinWheel()==true){
         Serial.println("switch open");
@@ -274,7 +293,7 @@ void TOUCH::move(int m, int motor){
       }
     break;        
 
-    case 6: //RIGHT MOTOR 3        
+    case 6: //RIGHT MOTOR 3     switches[2][0]=switch 1         switches[2][1]=switch 2
       Box.y2();
       if(Bluetooth.endOfpinWheel()==true){
         Serial.println("switch open");

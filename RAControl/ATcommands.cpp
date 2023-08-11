@@ -398,15 +398,24 @@ bool AT::endOfpinWheel(){
       a = char(Serial3.read());
       responseAT += a;
     }
-    //Serial.println(responseAT);
-    //Serial.println(responseAT.indexOf("CLOSE\r\n"));
-    //Serial.println(responseAT.indexOf("OPEN\r\n"));
-    if(responseAT.indexOf("CLOSE\r\n")>0){
-      //Serial.println("SWITCH CLOSE");
-      return false;
-    }
-    if(responseAT.indexOf("OPEN\r\n")>0){
-      //Serial.println("SWITCH OPEN");
+    
+    //[motor,S1,S2]
+    Serial.println(responseAT);
+    
+    if(responseAT.indexOf("[")>=0 and responseAT.indexOf("]\r\n")>0){
+
+      if(responseAT.substring(responseAT.indexOf("[")+1,responseAT.indexOf("[")+2) == "1"){
+        switches[0][0]=(responseAT.substring(responseAT.indexOf("[")+3,responseAT.indexOf(",")+4)).toInt(); //z1
+        switches[0][1]=(responseAT.substring(responseAT.indexOf("[")+5,responseAT.indexOf("[")+6)).toInt(); //z2
+      }
+      if(responseAT.substring(responseAT.indexOf("[")+1,responseAT.indexOf("[")+2) == "2"){
+        switches[1][0]=(responseAT.substring(responseAT.indexOf("[")+3,responseAT.indexOf(",")+4)).toInt(); //x1
+        switches[1][1]=(responseAT.substring(responseAT.indexOf("[")+5,responseAT.indexOf("[")+6)).toInt(); //x2
+      }
+      if(responseAT.substring(responseAT.indexOf("[")+1,responseAT.indexOf("[")+2) == "3"){
+        switches[2][0]=(responseAT.substring(responseAT.indexOf("[")+3,responseAT.indexOf(",")+4)).toInt(); //y1
+        switches[2][1]=(responseAT.substring(responseAT.indexOf("[")+5,responseAT.indexOf("[")+6)).toInt(); //y2
+      }
       return true;
     }
     findingCopy++;   

@@ -375,11 +375,12 @@ void HMI::firstDataUpdate(String a, String b, String c, int s[3][2]){
   Serial2.write(0xff);
   Serial2.write(0xff);
 
+  //guarda si los switches estan abiertos o cerrados
   for(i=0; i<3; i++){
-    if(s[i][0] == 1 and s[i][1] == 1){
+    if(s[i][0] == 1 and s[i][1] == 1){ //switch 1 and switch 2 closed
       //error no pueden ser ambos 1.
     }else{
-      if(s[i][0] == 1){
+      if(s[i][0] == 1){ //switch 1 closed
         switch(i){
           case 0: //z
             Serial2.print("z=1");
@@ -402,7 +403,7 @@ void HMI::firstDataUpdate(String a, String b, String c, int s[3][2]){
             Serial2.write(0xff);  
           break;
         }
-      }else if(s[i][1] == 1){
+      }else if(s[i][1] == 1){ //switch 2 closed
         switch(i){
           case 0: //z
             Serial2.print("z=2");
@@ -425,7 +426,7 @@ void HMI::firstDataUpdate(String a, String b, String c, int s[3][2]){
             Serial2.write(0xff);  
           break;
         }
-      }else{
+      }else{ //switch 1 and switch 2 opened
         switch(i){
           case 0: //z
             Serial2.print("z=0");
