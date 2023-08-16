@@ -19,7 +19,7 @@ class HMI{
     void firstDataUpdate(String a, String b, String c, int s[3][2]);
     void dataPosition(int send, String axis);
     void picture(String pic);
-    void endOfWheel(int end);
+    void endOfWheel(int end, int motor);
     void activeDeactiveTouch(String button, bool state);
 };
 

@@ -573,57 +573,86 @@ void HMI::picture(String pic){
 };
 
 
-void HMI::endOfWheel(int end){
+void HMI::endOfWheel(int end, int motor){
 
-  switch(end){
-    case 1:
-      picture("62");
-      Serial2.print("z=1");
-      Serial2.write(0xff);
-      Serial2.write(0xff);
-      Serial2.write(0xff);
-    break;
+  if(end==0){
+    switch(motor){
+      case 1:
+        picture("56");
+        Serial2.print("z=0");
+        Serial2.write(0xff);
+        Serial2.write(0xff);
+        Serial2.write(0xff);
+      break;
 
-    case 2:
-      picture("59");
-      Serial2.print("z=2");
-      Serial2.write(0xff);
-      Serial2.write(0xff);
-      Serial2.write(0xff);
-    break;
+      case 2:
+        picture("63");
+        Serial2.print("x=0");
+        Serial2.write(0xff);
+        Serial2.write(0xff);
+        Serial2.write(0xff);
+      break;
 
-    case 3:
-      picture("69");
-      Serial2.print("x=1");
-      Serial2.write(0xff);
-      Serial2.write(0xff);
-      Serial2.write(0xff);
-    break;
+      case 3:
+        picture("70");
+        Serial2.print("y=0");
+        Serial2.write(0xff);
+        Serial2.write(0xff);
+        Serial2.write(0xff);
+      break;      
+    }
+  }else{
+    switch(end){
+      case 1:
+        picture("62");
+        Serial2.print("z=1");
+        Serial2.write(0xff);
+        Serial2.write(0xff);
+        Serial2.write(0xff);
+      break;
 
-    case 4:
-      picture("66");
-      Serial2.print("x=2");
-      Serial2.write(0xff);
-      Serial2.write(0xff);
-      Serial2.write(0xff);
-    break;
+      case 2:
+        picture("59");
+        Serial2.print("z=2");
+        Serial2.write(0xff);
+        Serial2.write(0xff);
+        Serial2.write(0xff);
+      break;
 
-    case 5:
-      picture("76");
-      Serial2.print("y=1");
-      Serial2.write(0xff);
-      Serial2.write(0xff);
-      Serial2.write(0xff);
-    break;
+      case 3:
+        picture("69");
+        Serial2.print("x=1");
+        Serial2.write(0xff);
+        Serial2.write(0xff);
+        Serial2.write(0xff);
+      break;
 
-    case 6:
-      picture("73");
-      Serial2.print("y=2");
-      Serial2.write(0xff);
-      Serial2.write(0xff);
-      Serial2.write(0xff);
-    break;
+      case 4:
+        picture("66");
+        Serial2.print("x=2");
+        Serial2.write(0xff);
+        Serial2.write(0xff);
+        Serial2.write(0xff);
+      break;
+
+      case 5:
+        picture("76");
+        Serial2.print("y=1");
+        Serial2.write(0xff);
+        Serial2.write(0xff);
+        Serial2.write(0xff);
+      break;
+
+      case 6:
+        picture("73");
+        Serial2.print("y=2");
+        Serial2.write(0xff);
+        Serial2.write(0xff);
+        Serial2.write(0xff);
+      break;
+    }
   }
+
 
 };
 
